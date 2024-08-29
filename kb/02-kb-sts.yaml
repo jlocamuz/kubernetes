@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kb-prod
+  labels:
+    run: kb-prod
+spec:
+  serviceName: "kb-prod"
+  replicas: 1
+  selector:
+    matchLabels:
+      run: kb-prod
+  template:
+    metadata:
+      labels:
+        run: kb-prod
+    spec:
+      containers:
+        - name: kb-prod
+          image: kanboard/kanboard:v1.2.9
+          imagePullPolicy: Always
+          ports:
+            - name: kb-prod
+              containerPort: 80
+          volumeMounts:
+            - name: app-data
+              mountPath: /var/www/app/data
+            - name: app-plugins
+              mountPath: /var/www/app/plugins
+            - name: ssl-certificates
+              mountPath: /etc/nginx/ssl
+  volumeClaimTemplates:
+    - metadata:
+        name: app-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: app-plugins
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: ssl-certificates
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
