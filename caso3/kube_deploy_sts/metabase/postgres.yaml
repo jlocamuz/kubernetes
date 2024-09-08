@@ -20,7 +20,7 @@ spec:
   selector:
     matchLabels:
       app: postgres # tiene que coincidir con .spec.template.metadata.labels
-  serviceName: "postgres"
+  serviceName: "postgresservice"
   #replicas: 3 # por defecto es 1
   template:
     metadata:

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metabase
+  labels:
+    app: metabase
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metabase
+  template:
+    metadata:
+      labels:
+        app: metabase
+    spec:
+      containers:
+        - name: metabase
+          image: metabase/metabase:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MB_DB_TYPE
+              value: postgres
+            - name: MB_DB_DBNAME
+              value: db
+            - name: MB_DB_PORT
+              value: "5432"
+            - name: MB_DB_USER
+              value: julia
+            - name: MB_DB_PASS
+              value: pass
+            - name: MB_DB_HOST
+              value: postgresservice
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metabase-service
+spec:
+  selector:
+    app: metabase
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
