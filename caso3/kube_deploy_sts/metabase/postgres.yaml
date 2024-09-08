@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresservice
+  labels:
+    app: postgres
+spec:
+  ports:
+  - port: 5432
+    name: postgres
+  selector:
+    app: postgres
+--- 
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres # tiene que coincidir con .spec.template.metadata.labels
+  serviceName: "postgres"
+  #replicas: 3 # por defecto es 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      initContainers:
+      - name: "remove-lost-found"
+        image: "busybox:latest"
+        imagePullPolicy: "IfNotPresent"
+        command:  ["rm", "-fr", "/var/lib/postgresql/data/lost+found"]
+        volumeMounts:
+        - name: datapost
+          mountPath: /var/lib/postgresql/data
+      containers:
+        - name: postgres
+          image: postgres
+          ports: 
+          - containerPort: 5432
+            name: postgres
+          env: 
+          - name: POSTGRES_PASSWORD
+            value: pass
+          - name: POSTGRES_USER
+            value: julia
+          - name: POSTGRES_DB
+            value: db
+          volumeMounts:
+          - name: datapost
+            mountPath: /var/lib/postgresql/data
+
+  volumeClaimTemplates:
+  - metadata:
+      name: datapost
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+
+      
+            
