@@ -1,0 +1,15 @@
+MySQL
+Nombre para mostrar
+mariadb
+
+Servidor
+mariadb-service
+
+Puerto
+3306
+nombre de la base de datos
+google
+Nombre Usuario
+user
+Contraseña
+
